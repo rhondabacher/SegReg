@@ -1,21 +1,24 @@
-#' @title segmented regression on a gene
-#' @usage fit.seg(data, g.in, maxk=5, t.vect=NULL, min.num.in.seg=5, pvalcut=.1,
+#' @title Fit segmented regression for a gene
+#' @usage fit.seg(indata, g.in, maxk=5, t.vect=NULL, min.num.in.seg=5, pvalcut=.1,
 #'                cutdiff=.1, num.try=100,keepfit=FALSE)
-#' @param data normalized expression measure. Rows are genes and columns are samples. The data matrix is expected to be normalized.
-#' @param maxk max number of breakpoints to consider. 
-#' For each gene, the function will fit maxk+1 models containing 0->maxk breakpoints
-#' (1->(maxk+1)) segments. The model with highest adjusted r value will be selected.
-#' @param t.vect a numerical vector indicates time points. If it si NULL (default), the time will be assumed to be 1:N in which N is number of samples.
-#' @param min.num.in.seg min number of samples within a segment
-#' @param pvalcut p value cutoff. If the p value of a segment is greater than pvalcut,
-#' this segment will be called as 'no change'
-#' @param cutdiff default is 0.1. if the difference between r_adj from the k+1 breakpoint model
-#' and the r_adj from the k breakpoint model is less than cutdiff, the optimal number
-#' of breakpoint will be set as k instead of k+1
+
+#' @param indata matrix of normalized expression measures. Rows are genes and columns are samples. The data matrix is expected to be normalized.
+#' @param maxk max number of breakpoints to consider.
+#' @param t.vect a numerical vector indicates time points. If it is
+#' NULL (default), the time will be assumed to be 1:N in which N is number of equally spaced samples.
+#' @param meancut default is 10. Genes whose mean is less than meancut will not be considered.
+#' @param min.num.in.seg min number of samples within a segment.
+#' @param pvalcut p-value cutoff. If the p-value of a segment is greater than pvalcut,
+#' this segment will be called as 'no change'.
+#' @param cutdiff default is 0.1. If the difference between r_sq from the k+1 breakpoint model
+#' and the r_sq from the k breakpoint model is less than cutdiff, the optimal number
+#' of breakpoint will be set as k instead of k+1.
 #' @param num.try number of different seeds to try. If all num.try runs fails,
 #' linear regression results will be returned (which represents one segment case).
-#' @param keepfit whether keep the fitted object
-#' @param forceRadj corresponds to previous version of SegReg, only use adjR2 to compare models.
+#' @param keepfit whether to keep the fitted object.
+#' @param forceRadj whether to use adjusted r_sq instead of r_sq in model comparisons.
+
+
 #' @return id.sign: direction of each sample; -1: down, 0: no change, 1: up
 #' slp: fitted slopes, slp.sign: sign of fitted slopes, slp.pval: p value of each segment, 
 #' bp: estimated breakpoints, fitted: fitted values radj: adjusted r value of the model
@@ -23,7 +26,7 @@
 #' @examples d1 <- rbind(c(rep(1,50),1:50), c(100:1))
 #' rownames(d1) <- c("g1","g2")
 #' fit.seg(d1, "g1")
-#' @author Ning Leng
+#' @author Ning Leng & Rhonda Bacher
 ###################
 # fit segmented regression for each gene
 # the optimal k is the last one whose Radj is > last one + 0.1
@@ -31,11 +34,9 @@
 ###################
 #' @export
 
-fit.seg <- function(data, maxk=5, t.vect=NULL,min.num.in.seg=5, pvalcut=.1, 
-                    cutdiff=.1, num.try=100, keepfit=FALSE, forceRadj = FALSE) {
-  data.norm <- data
-  
-  library(segmented)
+fit.seg <- function(indata, maxk = 5, t.vect = NULL, min.num.in.seg = 5, pvalcut = .1, 
+                    cutdiff = .1, num.try = 100, keepfit = FALSE, forceRadj = FALSE) {
+  data.norm <- indata
   
   t.use <- 1:length(data.norm)
   t.l <- length(data.norm)
@@ -167,6 +168,6 @@ fit.seg <- function(data, maxk=5, t.vect=NULL,min.num.in.seg=5, pvalcut=.1,
   out = list(id.sign=id.sign, slp=slp.choose, slp.sign=slp.sign, slp.pval=slp.pval, bp=bp.choose, fitted=fv.choose,radj=radj[r.choose],fit=fit.choose)
   if(keepfit == FALSE) out <- out[1:7]
   
-  out
+return(out)
 }
 

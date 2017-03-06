@@ -2,23 +2,29 @@
 % Please edit documentation in R/extractpattern.R
 \name{extractpattern}
 \alias{extractpattern}
-\title{extract pattern from segmented regression}
+\title{Extract genes following a given pattern from segmented regression}
 \usage{
-extractpattern(segdata, radjcut = 10, pattern = 0)
+extractpattern(segdata, radjcut = 10, pattern = NULL, delay=0)
 }
 \arguments{
 \item{segdata}{segreg object}
 
-\item{radjcut}{only consider genes with adjusted R^2 > radjcut. Default = .5.}
+\item{pattern}{vector containing pattern to search features. If length is one then only consider features with constant pattern across the entire time-course.}
 
-\item{pattern}{vector containing pattern to search genes. If length is one then consider genes with constant pattern.}
+\item{radjcut}{only consider features with adjusted r_sq > radjcut. Default = .5.}
+
+\item{delay}{search for pattern starting after certain time-point.}
 }
 \value{
-genes: name of genes containing pattern
+Gene: names of features containing pattern.
+
+Breakpoint: estimated breakpoint connecting the segments of the pattern.
 }
 \examples{
-extractpattern(segdata, pattern = c("up")) #increasing only genes
-extractpattern(segdata, pattern = c("up", "down")) #genes with a peak
+extractpattern(segdata, pattern = c("up")) #increasing only features
+extractpattern(segdata, pattern = c("up", "down")) #features with a peak
+extractpattern(segdata, pattern = c("up", "down"), delay=20) #features with a peak after 20th time-point
+extractpattern(segdata, pattern = c("same", "down")) #features which display delaying decreasing behavior.
 }
 \author{
 Rhonda Bacher

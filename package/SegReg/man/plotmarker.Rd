@@ -2,30 +2,32 @@
 % Please edit documentation in R/plotmarker.R
 \name{plotmarker}
 \alias{plotmarker}
-\title{plot markers of interest}
+\title{Plot markers of interest}
 \usage{
-plotmarker(data, t.vect=NULL, filename=NULL, listname, pdf=FALSE, seg=TRUE, fittedres=NULL,
+plotmarker(indata, t.vect = NULL, outfile = NULL, listfeatures, savePDF = FALSE, plotFit = TRUE, fittedreg=NULL,
 cond.col=NULL, cond.col.sample=NULL, cond.prefix="day",
 yname="normalized expression",par.param = c(3,2),
 pdfheight=15, pdfwidth=10)
 }
 \arguments{
-\item{data}{normalized expression matrix; rows are genes and columns are samples}
+\item{indata}{matrix of normalized expression measures. Rows are genes and columns are samples. The data matrix is expected to be normalized.}
 
-\item{t.vect}{a numerical vector indicates time points. If it si
-NULL (default), the time will be assumed to be 1:N in which N is number of samples.}
+\item{t.vect}{a numerical vector indicates time points. If it is
+NULL (default), the time will be assumed to be 1:N in which N is number of equally spaced samples.}
 
-\item{filename}{output file name; will be ignored if pdf=F}
+\item{outfile}{output file name; will be ignored if savePDF=F. Default is feature_expressionScatter.}
 
-\item{listname}{a list of genes of interest}
+\item{listfeatures}{a list of genes of interest}
 
-\item{seg}{whether plot the segmented regression fitting}
+\item{savePDF}{whether output figs to a pdf file.}
 
-\item{fittedres}{segmented regression fitting result; if fittedres is NULL and seg=T, segmented regression will be fitted for each of the genes and it may take longer runtime}
+\item{plotFit}{whether to plot the segmented regression fitting.}
+
+\item{fittedreg}{segmented regression fitting result; if fittedres is NULL and seg=T, segmented regression will be fitted for each of the genes and it may take longer runtime}
 
 \item{cond.col}{color for each condition, names of this vector should be condition names; if it is null, no legends will be generated}
 
-\item{cond.col.sample}{each sample's color. The vector's length should match number of samples. if it si NULL, expressions will be shown in black.}
+\item{cond.col.sample}{each sample's color. The vector's length should match number of samples. If it is NULL, expressions will be shown in black.}
 
 \item{cond.prefix}{prefix to be appended to condition name}
 
@@ -34,11 +36,9 @@ NULL (default), the time will be assumed to be 1:N in which N is number of sampl
 \item{par.param}{mfrow, default c(3,2)}
 
 \item{pdfheight, pdfwidth}{height and width for the pdf file}
-
-\item{whether}{output figs to a pdf file}
 }
 \value{
-plot of gene expression and fitted line
+plot of gene expression and fitted lines.
 }
 \examples{
 d1 <- rbind(c(rep(1,50),1:50), c(100:1))
@@ -46,6 +46,6 @@ rownames(d1) <- c("g1","g2")
 plotmarker(d1, listname=c("g1","g2"), pdf = FALSE)
 }
 \author{
-Ning Leng
+Ning Leng & Rhonda Bacher
 }
 

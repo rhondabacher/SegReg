@@ -1,13 +1,13 @@
 ---
 title: "SegReg: Breakpoint analysis of time course expression data"
-author: "Ning Leng, Ron Stewart"
+author: "Rhonda Bacher, Ning Leng, Ron Stewart"
 output:
   pdf_document:
     toc: true
 ---
 
 # Overview
-SegReg is a R package that can be used to perform breakpoint analysis on Microarrays or RNA-seq expression data with ordered conditions (e.g. time course, spatial course).
+SegReg is an R package that can be used to perform breakpoint analysis on microarrays or RNA-seq expression data with ordered conditions (e.g. time course, spatial course).
 For each gene or other features, SegReg estimates the optimal number of breakpoints as well as
 the breakpoints by fitting a set of segmented regression models.
 The top dynamic genes are then identified by taking genes that can be well profiled by its gene-specific segmented regression model.
@@ -32,11 +32,11 @@ $$+\beta^k_{k+1}*I\{s: s\ge b^k_{g,k}+1, s \le S\}*(s-b^k_{g,k})
 $$
 For each $k$, the segmented regression estimates $k$ breakpoints 
 ($b^k_{g,1}$, $b^k_{g,2}$, ... $b^k_{g,k})$ between $1$ and $S$.
-The segmented regression also estimate $k+2$ $\beta$s. In which $\beta^k_0$
+The segmented regression also estimates $k+2$ $\beta$s. In which $\beta^k_0$
 indicates the intercept, and the other $\beta$s indicate slopes for the $k+1$ segments separated by the $k$ breakpoints.
-We denote the adjusted $R^2$ for this model as $r^k_g$.
+We denote the $R^2$ for this model as $r^k_g$.
 
-For a given gene, among the models with varying $k$, SegeReg picks the optimal number of breakpoints for this gene by comparing the adjusted $R^2$s:
+For a given gene, among the models with varying $k$, SegeReg picks the optimal number of breakpoints for this gene by comparing the $R^2$s:
 
 $$\tilde{k_g} = \text{argmax}_{k=1,...,n_k}(r^k_g) $$
 
@@ -83,7 +83,7 @@ install.packages("devtools")
 library(devtools)
 ```
 ```{r, eval=FALSE}
-install_github("lengning/SegReg/package/SegReg")
+install_github("rhondabacher/SegReg/package/SegReg")
 ```
 ## Install locally
 
@@ -98,7 +98,7 @@ library("gplots")
 
 Download the SegReg package from:
 
-\url{https://github.com/lengning/SegReg/tree/master/package}
+\url{https://github.com/rhondabacher/SegReg/tree/master/package}
 
 And install the package locally.
 
@@ -114,12 +114,10 @@ library(SegReg)
 
 The input data should be a $G-by-S$ matrix containing the expression values for each gene and
  each sample, where $G$ is the number of genes and $S$ is the number of samples. 
-The samples should be sorted following the time course order.
+The samples should be sorted following the time-course order.
 These values should exhibit expression data after normalization across samples. 
 For example, for RNA-seq data, the raw counts may be normalized using MedianNorm and
-GetNormalizedMat() function in EBSeq. More details can be found in the EBSeq vignette:
-
-
+GetNormalizedMat() functions in EBSeq. More details can be found in the EBSeq vignette:
 http://www.bioconductor.org/packages/devel/bioc/vignettes/EBSeq/inst/doc/EBSeq_Vignette.pdf
 
 
@@ -134,33 +132,30 @@ str(SegRegExData)
 
 
 ## Run segmented regressions
-The segreg() function can be used to run gene specific segmented regressions.
-Here we want to only consider up to 2 breakpoints for each gene. To do so we may specify maxk=2:
+The segreg() function is used to run gene specific segmented regressions.
+Here we want to only consider up to 2 breakpoints for each gene. To do so we may specify maxk = 2:
 
 ```{r, cache=TRUE}
-res <- segreg(SegRegExData, maxk=2)
-res.top <- topsegreg(res) 
-# default adjusted R square cutoff is 0.5
+res <- segreg(SegRegExData, maxk = 2)
+res.top <- topsegreg(res) # default adjusted R squared cutoff is 0.5
 res.top$radj
 ```
 The topsegreg() function may be used to extract top dynamic genes.
-By default, topsegreg() will extract genes whose adjusted $R^2$ $r_g$
-is greater or equal to 0.5. To change this threshold, a user may specify the
+By default, topsegreg() will extract genes whose adjusted $R^2$ is greater or equal to 0.5. To change this threshold, a user may specify the
 r.cut parameter in topsegreg() function.
-res.top\$radj gives $r_g$ of the top dynamic genes, sorted decreasingly
-by $r_g$.
+res.top\$radj gives $r_{g, \text{adj}}$ of the top dynamic genes, sorted decreasingly
+by $r_{g, \text{adj}}$.
 
 
 By default the segreg() function only consider genes whose mean expression is greater than 10. 
-To use another threshold, a user may specify the parameter meancut in
-segreg() function.
+To use another threshold, a user may specify the parameter meancut in the segreg() function.
 
 
 ## Visualize trends of the top dynamic genes
 res.top\$id.sign gives trend specification of the top genes.
 Function trendheatmap() can be used to display these trends:
 
-```{r, cache=TRUE, warning=FALSE, fig.height=7}
+```{r, cache=TRUE, warning=FALSE, fig.height=6}
 res.trend <- trendheatmap(res.top)
 str(res.trend)
 ```
@@ -170,23 +165,23 @@ three groups: start with up, start with down and start with no change.
 Within each group, genes are sorted by the position of the first breakpoint.
 
 
-To generate expression heatmap of the first group of genes (first go up):
+To generate expression heatmap of the first group of genes (first segment goes up):
 
 ```{r, cache=TRUE, warning=FALSE}
-heatmap.2(SegRegExData[names(res.trend$firstup),],trace="none", Rowv=F,Colv=F, 
-					scale="row", main="top genes (first go up)")
+heatmap.2(SegRegExData[names(res.trend$firstup),],trace="none", Rowv=F,Colv=F, lwd=2,
+					scale="row", main="Top Genes (first segment up)")
 ```
 
 
-Similarly, to generate expression heatmap of the second group of genes (first go down):
+Similarly, to generate expression heatmap of the second group of genes (first segment goes down):
 ```{r, cache=TRUE, warning=FALSE}
 heatmap.2(SegRegExData[names(res.trend$firstdown),],trace="none", Rowv=F,Colv=F, 
-					          scale="row", main="top genes (first go down)")
+					          scale="row", main="Top Genes (first segment down)")
 ```
-To generate expression heatmap of the second group of genes (first no change):
-```{r, cache=TRUE, warning=FALSE, fig.height=4}
+To generate expression heatmap of the second group of genes (first segment no change):
+```{r, cache=TRUE, warning=FALSE}
 heatmap.2(SegRegExData[names(res.trend$firstnochange),],trace="none", Rowv=F,Colv=F,
-					                    scale="row", main="top genes (first no change)",
+					                    scale="row", main="Top Genes (first segment same)",
 															cexRow=.8)
 ```
 
@@ -197,7 +192,7 @@ The plotmarker() function may be used to plot expression of individual genes and
 For example, to plot the top 6 genes in the first group of genes (first go up): 
 
 ```{r, cache=TRUE, fig.height=7}
-plot1 <- plotmarker(SegRegExData,listname=names(res.trend$firstup)[1:6],fittedres=res)
+plot1 <- plotmarker(SegRegExData,listfeatures=names(res.trend$firstup)[1:6],fittedreg=res)
 ```
 
 The input of function plotmarker() requires the expression data and a list of genes of interest.
@@ -209,14 +204,14 @@ Specifying fitted results obtained from previous steps will save time by avoidin
 Similarly, to plot the top 6 genes in the second group of genes (first go down): 
 
 ```{r, cache=TRUE, fig.height=7}
-plot2 <- plotmarker(SegRegExData,listname=names(res.trend$firstdown)[1:6],
-										fittedres=res)
+plot2 <- plotmarker(SegRegExData,listfeatures=names(res.trend$firstdown)[1:6],fittedreg=res)
+
+
 ```
 
 To plot the 2 genes in the third group of genes (first no change):
-```{r, cache=TRUE, fig.height=3}
-plot2 <- plotmarker(SegRegExData,listname=names(res.trend$firstnochange)[1:2],
-										fittedres=res,par.param=c(1,2))
+```{r, cache=TRUE, fig.height=4}
+plot2 <- plotmarker(SegRegExData,listfeatures=names(res.trend$firstnochange)[1:2],fittedreg=res,par.param=c(1,2))
 ```
 
 ## Gene specific estimates
@@ -239,7 +234,6 @@ To calculate number of breakpoints over the time course:
 
 ```{r, cache=TRUE}
 res.bp <- bpdist(res.top)
-barplot(res.bp, ylab="Number of breakpoint", col="blue")
 ```
 
 The bar plot indicates that many genes have breakpoint around s12 and s13.
@@ -259,17 +253,16 @@ names(t.v) <- colnames(SegRegExData)
 print(t.v)
 ```
 To run SegReg model using the empirical collecting time instead of sample ID (1-40):
-```{r, cache=TRUE}
+```{r, cache=TRUE, fig.height=8}
 res2 <- segreg(SegRegExData, t.vect=t.v, maxk=2)
 res.top2 <- topsegreg(res2)
-res.trend2 <- trendheatmap(res.top2, showplot=FALSE)
+res.trend2 <- trendheatmap(res.top2, showplot=TRUE, savePDF = FALSE)
 str(res.trend2)
 ```
 To plot the first 6 genes that 
 have up-regulated pattern at the beginning of the time course, by showing empirical time at x axis:
-```{r, cache=TRUE, fig.height=7}
-plot1.new <- plotmarker(SegRegExData,t.vect=t.v,
-									listname=names(res.trend2$firstup)[1:6],fittedres=res2)
+```{r, cache=TRUE, fig.height=6}
+plot1.new <- plotmarker(SegRegExData,t.vect=t.v,listfeatures=names(res.trend2$firstup)[1:6],fittedreg=res2)
 ```
 
 ## Additional options
@@ -278,6 +271,33 @@ the thresholds
 $c_{num}$, $c_{diff}$ and  $c_{pval}$
 can be specified via parameters
 min.num.in.seg, cutdiff and pvalcut.
+
+\newpage
+
+## Using the Shiny app
+
+This R package also contains a shiny app, which takes as input the object created while running the segreg() function (the default name of this object is rdata_object_forShiny). 
+# ```{r, cache=TRUE}
+# data(rdata_object_forShiny)
+```
+
+The shiny app can be used to interactively view genes one at a time. After uploading the RData object saved during segreg(), entering a gene name will produce a plot of the normalized gene expression on the raw and log2 scales. The fitted trend is displayed on the raw scale data. Only genes which passed the mean filter in segreg() are searchable.
+
+\begin{figure}[h!]
+\includegraphics[width=1\textwidth]{viz_genes_single.png}
+\caption{Vizualize genes individually.}
+\end{figure}
+
+\newpage
+
+Users may also identify genes which follow a given pattern. A pattern such as "up,down" indicates a gene is peaking during the timecourse.
+
+\begin{figure}[h!]
+\includegraphics[width=1\textwidth]{genes_with_pattern.png}
+\caption{Extract list of genes having a specific pattern and output a plot and list of genes.}
+\end{figure}
+
+
 
 
 # SessionInfo

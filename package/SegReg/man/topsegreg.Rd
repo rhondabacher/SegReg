@@ -2,18 +2,18 @@
 % Please edit documentation in R/topsegreg.R
 \name{topsegreg}
 \alias{topsegreg}
-\title{obtain top genes from segreg results}
+\title{Obtain top genes from segreg results}
 \usage{
 topsegreg{res.segreg, r.cut=.5}
 }
 \arguments{
-\item{res.segreg}{output from the segreg function}
+\item{res.segreg}{output from the segreg function.}
 
-\item{r.cut}{cutoff for the adjusted r square. genes whose adjusted
-r square is greater than r.cut are called as significant.}
+\item{r.cut}{cutoff for the adjusted r_sq. Genes whose adjusted
+r_sq is greater than r.cut are called as significant.}
 }
 \value{
-only significant genes will be included in the output
+only significant genes will be included in the output.
 id.sign direction of each sample; -1: down, 0: no change, 1: up
 slp: fitted slopes, slp.sign: sign of fitted slopes, slp.pval: p value of each segment, 
 bp: estimated breakpoints, fitted: fitted values radj: adjusted r value of the model

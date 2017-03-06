@@ -1,1 +1,4 @@
 .DS_Store
+package/vignette/SegReg_vignette_files/*
+package/vignette/SegReg_vignette_cache/*
+

@@ -1,26 +1,28 @@
-#' @title extract pattern from segmented regression
-#' @usage extractpattern(segdata, radjcut = 10, pattern = 0)
+#' @title Extract genes following a given pattern from segmented regression
+#' @usage extractpattern(segdata, radjcut = 10, pattern = NULL, delay=0)
 #' @param segdata segreg object
-#' @param radjcut only consider features with adjusted R^2 > radjcut. Default = .5.
-#' @param pattern vector containing pattern to search features. If length is one then only consider features with constant pattern across the entire time-course.
-#' @delay search for pattern starting after certain time-point.
-#' @return genes: names of features containing pattern.
+#' @param radjcut only consider features with adjusted r_sq > radjcut. Default = .5.
+#' @param pattern vector containing pattern to search features. If length is one then only consider features with constant pattern across the entire time-course. 
+#' @param delay search for pattern starting after certain time-point.
+#' @return Gene: names of features containing pattern.
+#' @return Breakpoint: estimated breakpoint connecting the segments of the pattern.
 #' @examples extractpattern(segdata, pattern = c("up")) #increasing only features
 #' extractpattern(segdata, pattern = c("up", "down")) #features with a peak
 #' extractpattern(segdata, pattern = c("up", "down"), delay=20) #features with a peak after 20th time-point
+#' extractpattern(segdata, pattern = c("same", "down")) #features which display delaying decreasing behavior.
 #' @author Rhonda Bacher
 ###################
-# Enter pattern of interest and return genes having that pattern.
+# Enter pattern of interest and return genes having a given pattern.
 ###################
 #' @export
 
-extractpattern <- function (segdata, pattern = NULL, radjcut = .5,  delay = 0) 
+extractpattern <- function (segdata, radjcut = .5, pattern = NULL,  delay = 0) 
 {
   
-  if(is.null(pattern)) stop("Must specify a pattern")
+  if (is.null(pattern)) stop("Must specify a pattern")
+
   ogpat <- pattern
-  ##restrict to genes that have certain breakpoint pattern
-  
+
   segdata.radj <- sort(sapply(segdata, function(i)i$radj), decreasing=TRUE) #get radj for each gene
   
   genes.pass <- names(segdata.radj)[which(segdata.radj >= radjcut)] #get genes with fit >= radjcut
@@ -34,6 +36,7 @@ extractpattern <- function (segdata, pattern = NULL, radjcut = .5,  delay = 0)
   pattern[pattern == "up"] <- 1
   pattern[pattern == "same"] <- 0
   pattern[pattern == "down"] <- 2
+  pattern[pattern == -1] <- 2
   
   
   if(length(pattern) == 1) {
